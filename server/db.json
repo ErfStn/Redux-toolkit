@@ -1,34 +1,24 @@
 {
   "todos": [
     {
-      "id": 1,
-      "title": "todo1",
+      "id": 1681180661963,
+      "title": "playing guitar",
       "completed": false
     },
     {
-      "id": 2,
-      "title": "todo2",
-      "completed": false
-    },
-    {
-      "id": 3,
-      "title": "todo3",
+      "id": 1681180668964,
+      "title": "reading book",
       "completed": true
     },
     {
-      "id": 4,
-      "title": "todo4",
+      "id": 1681181071481,
+      "title": "Exercise",
       "completed": false
     },
     {
-      "id": 5,
-      "title": "todo5",
+      "id": 1681181106349,
+      "title": "Project completion",
       "completed": true
-    },
-    {
-      "id": 1681177041626,
-      "title": "todo6",
-      "completed": false
     }
   ]
 }

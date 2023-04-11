@@ -13,10 +13,10 @@ const TodoList = () => {
 	}, []);
 
 	if (loading) {
-		return <p>Loading...</p>;
+		return <h4>Loading...</h4>;
 	}
 	if (error) {
-		return <p>{error}</p>;
+		return <h4 className="text-danger">{error}</h4>;
 	}
 	return (
 		<ul className="list-group">

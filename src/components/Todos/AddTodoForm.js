@@ -8,12 +8,15 @@ const AddTodoForm = () => {
 
 	const onSubmit = event => {
 		event.preventDefault();
-		dispatch(addAsyncTodos({ title: value }));
+		if (value) {
+			dispatch(addAsyncTodos({ title: value }));
+		}
+		setValue("");
 	};
 
 	return (
 		<form onSubmit={onSubmit} className="form-inline mt-3 mb-3">
-			<label className="sr-only">Name</label>
+			<h3 className="sr-only text-primary">Todo list</h3>
 			<input
 				type="text"
 				className="form-control mb-2 mr-sm-2"

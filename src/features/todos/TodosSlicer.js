@@ -9,13 +9,12 @@ export const getAsyncTodos = createAsyncThunk(
 			const response = await axios.get("http://localhost:3001/todos");
 			return response.data;
 		} catch (error) {
-			return rejectWithValue([], error);
+			return rejectWithValue(error);
 		}
 	}
 );
 
 // ! adding todos from input
-
 export const addAsyncTodos = createAsyncThunk(
 	"todos/addAsyncTodos",
 	async (payload, { rejectWithValue }) => {
@@ -31,6 +30,37 @@ export const addAsyncTodos = createAsyncThunk(
 		}
 	}
 );
+// ! toggle todos
+export const toggleAsyncTodos = createAsyncThunk(
+	"todos/toggleAsyncTodos",
+	async (payload, { rejectWithValue }) => {
+		try {
+			const response = await axios.put(
+				`http://localhost:3001/todos/${payload.id}`,
+				{
+					id: payload.id,
+					title: payload.title,
+					completed: payload.completed,
+				}
+			);
+			return response.data;
+		} catch (error) {
+			return rejectWithValue([], error);
+		}
+	}
+);
+// ! delete todos
+export const deleteAsyncTodos = createAsyncThunk(
+	"todos/deleteAsyncTodos",
+	async (payload, { rejectWithValue }) => {
+		try {
+			await axios.delete(`http://localhost:3001/todos/${payload.id}`);
+			return { id: payload.id };
+		} catch (error) {
+			return rejectWithValue([], error);
+		}
+	}
+);
 
 const initialState = {
 	todos: [],
@@ -41,6 +71,7 @@ const initialState = {
 export const todosSlice = createSlice({
 	name: "todos",
 	initialState,
+	// ? sync reducer
 	reducers: {
 		addTodo: (state, action) => {
 			const newTodo = {
@@ -59,6 +90,7 @@ export const todosSlice = createSlice({
 			state.todos = filterTodo;
 		},
 	},
+	// ? async reducer
 	extraReducers: {
 		[getAsyncTodos.fulfilled]: (state, action) => {
 			return { ...state, todos: action.payload, loading: false };
@@ -71,12 +103,21 @@ export const todosSlice = createSlice({
 				...state,
 				loading: false,
 				todos: [],
-				error: action.error.message,
+				error: action.payload.message,
 			};
 		},
-		// ! add todo action
+		// ! add todo reducer
 		[addAsyncTodos.fulfilled]: (state, action) => {
 			state.todos.push(action.payload);
+		},
+		// ! toggle todo reducer
+		[toggleAsyncTodos.fulfilled]: (state, action) => {
+			const selectedTodo = state.todos.find(t => t.id === action.payload.id);
+			selectedTodo.completed = action.payload.completed;
+		},
+		// ! delete todo reducer
+		[deleteAsyncTodos.fulfilled]: (state, action) => {
+			state.todos = state.todos.filter(t => t.id !== action.payload.id);
 		},
 	},
 });
