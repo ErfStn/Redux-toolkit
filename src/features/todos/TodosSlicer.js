@@ -1,12 +1,42 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
-const initialState = [
-	{ id: 1, title: "todo1", completed: false },
-	{ id: 2, title: "todo2", completed: false },
-	{ id: 3, title: "todo3", completed: true },
-	{ id: 4, title: "todo4", completed: false },
-	{ id: 5, title: "todo5", completed: true },
-];
+// ! loading list of todos
+export const getAsyncTodos = createAsyncThunk(
+	"todos/getAsyncTodos",
+	async (_, { rejectWithValue }) => {
+		try {
+			const response = await axios.get("http://localhost:3001/todos");
+			return response.data;
+		} catch (error) {
+			return rejectWithValue([], error);
+		}
+	}
+);
+
+// ! adding todos from input
+
+export const addAsyncTodos = createAsyncThunk(
+	"todos/addAsyncTodos",
+	async (payload, { rejectWithValue }) => {
+		try {
+			const response = await axios.post("http://localhost:3001/todos/", {
+				id: Date.now(),
+				title: payload.title,
+				completed: false,
+			});
+			return response.data;
+		} catch (error) {
+			return rejectWithValue([], error);
+		}
+	}
+);
+
+const initialState = {
+	todos: [],
+	erorr: null,
+	loading: false,
+};
 
 export const todosSlice = createSlice({
 	name: "todos",
@@ -20,9 +50,37 @@ export const todosSlice = createSlice({
 			};
 			state.push(newTodo);
 		},
+		toggleTodos: (state, action) => {
+			const selectTodo = state.todos.find(t => t.id === action.payload.id);
+			selectTodo.completed = !selectTodo.completed;
+		},
+		deleteTodo: (state, action) => {
+			const filterTodo = state.todos.filter(t => t.id !== action.payload.id);
+			state.todos = filterTodo;
+		},
+	},
+	extraReducers: {
+		[getAsyncTodos.fulfilled]: (state, action) => {
+			return { ...state, todos: action.payload, loading: false };
+		},
+		[getAsyncTodos.pending]: (state, action) => {
+			return { ...state, loading: true, todos: [] };
+		},
+		[getAsyncTodos.rejected]: (state, action) => {
+			return {
+				...state,
+				loading: false,
+				todos: [],
+				error: action.error.message,
+			};
+		},
+		// ! add todo action
+		[addAsyncTodos.fulfilled]: (state, action) => {
+			state.todos.push(action.payload);
+		},
 	},
 });
 
-export const { addTodo } = todosSlice.actions;
+export const { addTodo, toggleTodos, deleteTodo } = todosSlice.actions;
 
 export default todosSlice.reducer;
